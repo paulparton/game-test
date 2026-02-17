@@ -16,9 +16,13 @@ export class SplashScene extends Phaser.Scene {
     // Set background color
     this.cameras.main.setBackgroundColor('#1a1a2e');
 
-    // Add background rectangle for contrast
-    const bg = this.add.rectangle(width / 2, height / 2, width, height, 0x0a0a1a);
-    bg.setDepth(-10);
+    // Test: Draw a simple rectangle to verify rendering
+    const graphics = this.make.graphics({ x: 0, y: 0, add: false });
+    graphics.fillStyle(0xff0000, 1);
+    graphics.fillRect(width / 2 - 200, height / 2 - 100, 400, 200);
+    graphics.lineStyle(3, 0xffff00, 1);
+    graphics.strokeRect(width / 2 - 200, height / 2 - 100, 400, 200);
+    this.add.existing(graphics);
 
     // Title with outer glow
     const titleBg = this.add.rectangle(width / 2, height / 3, 600, 150, 0xff4444, 0.1);

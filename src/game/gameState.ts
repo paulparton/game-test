@@ -12,6 +12,7 @@ import {
   movePieceLeft,
   movePieceRight,
   movePieceDown,
+  rotatePiece,
   placePiece,
   detectChains,
   addGarbage,
@@ -33,6 +34,7 @@ interface GameStore {
   movePieceLeftAction: (playerNum: number) => void;
   movePieceRightAction: (playerNum: number) => void;
   dropPieceAction: (playerNum: number) => void;
+  rotatePieceAction: (playerNum: number) => void;
   lockPieceAction: (playerNum: number) => void;
   addChainDamage: (toPlayer: number, damage: number) => void;
   setGameActive: (active: boolean) => void;
@@ -133,6 +135,25 @@ export const useGameStore = create<GameStore>((set) => ({
       const updatedPlayer = {
         ...player,
         gameState: { ...player.gameState, currentPiece: newPiece },
+      };
+
+      return playerNum === 1
+        ? { ...state, player1: updatedPlayer }
+        : { ...state, player2: updatedPlayer };
+    });
+  },
+
+  rotatePieceAction: (playerNum: number) => {
+    set((state) => {
+      const player = playerNum === 1 ? state.player1 : state.player2;
+      if (!player.gameState.currentPiece) return state;
+
+      const rotated = rotatePiece(player.gameState.currentPiece, player.gameState.board);
+      if (!rotated) return state;
+
+      const updatedPlayer = {
+        ...player,
+        gameState: { ...player.gameState, currentPiece: rotated },
       };
 
       return playerNum === 1

@@ -8,10 +8,19 @@ A production-quality Puyo Puyo game built with **TypeScript**, **Phaser 3**, **Z
 - ✅ **Classic Puyo Mechanics**: Match 4+ colored puyos to clear
 - ✅ **Chain System**: Build multipliers with cascading matches
 - ✅ **AI Opponents**: Multiple difficulty levels (Easy, Normal, Hard, Extreme)
-- ✅ **Local 2-Player Multiplayer**: Same-device competitive play
-- ✅ **Garbage Attacks**: Send garbage blocks to opponent
+- ✅ **Local 2-Player Multiplayer**: Same-device competitive play with side-by-side boards
+- ✅ **Professional Graphics**: Glowing borders, grid lines, enhanced puyo rendering
+- ✅ **Improved Audio System**: Web Audio API synthesis with procedural music and sound effects
 - ✅ **Score Multipliers**: Reward skilled chain building
-- ✅ **Next Piece Preview**: Plan ahead strategically
+- ✅ **Smooth Rotation**: Piece rotation with wall-kick support
+
+### Graphics & Audio
+- ✅ **Glowing Board Borders**: Yellow highlight effect for board visibility
+- ✅ **Enhanced Puyo Rendering**: Highlights, shadows, and active piece glow
+- ✅ **Grid Lines**: Visual guide for board layout
+- ✅ **Web Audio API Audio**: Synthesized music and sound effects (no external audio files)
+- ✅ **Procedural Music**: Algorithmic melody generation with looping pattern
+- ✅ **Dynamic Sound Effects**: Unique tones for each game action
 
 ### Code Architecture
 - ✅ **Pure Game Logic**: Fully decoupled from rendering (testable, portable)
@@ -19,6 +28,7 @@ A production-quality Puyo Puyo game built with **TypeScript**, **Phaser 3**, **Z
 - ✅ **TypeScript**: Full type safety throughout
 - ✅ **Performance Optimized**: 60 FPS on standard hardware
 - ✅ **Modular Structure**: Easy to extend with new features
+- ✅ **Web Audio API Integration**: No external audio dependencies
 
 ### Developer Experience
 - ✅ **Vite Build System**: Fast dev server with HMR
@@ -61,14 +71,18 @@ src/
 ├── game/                    # Pure game logic (no dependencies)
 │   ├── types.ts            # Core type definitions
 │   ├── constants.ts        # Game configuration
-│   ├── board.ts            # Board logic & mechanics
+│   ├── board.ts            # Board logic & mechanics with wall-kick rotation
 │   ├── gameState.ts        # State management (Zustand)
 │   └── ai.ts               # AI opponent logic
 │
 ├── input/                   # Input handling
-│   └── inputManager.ts     # Keyboard/gamepad/touch input
+│   └── inputManager.ts     # Keyboard input handling
+│
+├── audio/                   # Audio system
+│   └── soundManager.ts     # Web Audio API sound synthesis & music
 │
 ├── scenes/                  # Phaser scenes
+│   ├── SplashScene.ts      # Title screen
 │   ├── MenuScene.ts        # Main menu with options
 │   └── GameScene.ts        # Main gameplay scene
 │
@@ -79,11 +93,35 @@ src/
 ## 🎮 How to Play
 
 ### Controls
-- **Arrow Keys / WASD**: Move piece left/right
-- **Space / Up Arrow / W**: Rotate piece
-- **Enter**: Hard drop piece
-- **Escape / P**: Pause game
-- **Gamepad**: Full controller support (D-pad to move, A/X to rotate, B/Y to drop)
+
+#### Player 1 (Arrow Keys)
+| Key | Action |
+|-----|--------|
+| ← → | Move piece left/right  
+| ↑ or Space | Rotate piece  
+| ↓ | Soft drop piece  
+| Enter | Hard drop piece  
+
+#### Player 2 (WASD) - Two-Player Mode Only
+| Key | Action |
+|-----|--------|
+| A / D | Move piece left/right  
+| W | Rotate piece  
+| S | Soft drop piece  
+| Q | Hard drop piece  
+
+#### Shared Controls
+| Key | Action |
+|-----|--------|
+| P or Esc | Pause/Resume game  
+
+### Audio
+- **Background Music**: Looping upbeat melody plays during gameplay
+- **Sound Effects**:
+  - Piece rotation: Short beep tone
+  - Piece lock: Bell-like tone
+  - Match clear: Ascending tone sequence
+  - Game over: Descending 4-note sequence
 
 ### Objective
 1. Match 4+ puyos of the same color
@@ -302,18 +340,15 @@ This codebase demonstrates several professional practices:
 ## 🐛 Known Issues & Limitations
 
 ### Current Build
-- Text rendering recreates every frame (Phase 2: optimize with sprite rendering)
-- AI doesn't look ahead multiple moves (intentional for difficulty balance)
-- No touch controls (Phase 2: add swipe gestures)
-- No audio (Phase 2: add sound design)
-- No visual effects (Phase 2: add GSAP animations)
-
-### Planned Fixes
-- Sprite-based UI for better performance
-- Lookahead AI with configurable depth
-- Touch input and mobile optimization
-- Professional sound design
-- Particle effects and animations
+- ✅ All core gameplay implemented and functional
+- ✅ Audio system complete with Web Audio API synthesis
+- ✅ Graphics improved with glowing borders and enhanced rendering
+- ✅ Two-player mode fully supported
+- ✅ Rotation with wall-kick support
+- ⚠️ No touch controls (keyboard only for now)
+- ⚠️ No gamepad support (future enhancement)
+- ⚠️ AI opponent plays but not optimized for difficulty levels
+- ⚠️ Visual animations not yet polished (next phase)
 
 ## 📖 Additional Resources
 

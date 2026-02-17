@@ -1,14 +1,38 @@
 /**
- * Input handling system - manages keyboard, gamepad, and touch input
+ * Input handling system - manages keyboard input with separate controls for each player
+ * 
+ * Player 1 Controls (Arrow Keys):
+ * - Left/Right: Move piece left/right
+ * - Down: Soft drop
+ * - Space/Up: Rotate
+ * - Enter: Hard drop
+ * 
+ * Player 2 Controls (WASD):
+ * - A/D: Move piece left/right
+ * - S: Soft drop
+ * - W: Rotate
+ * - Q: Hard drop
+ * 
+ * Shared:
+ * - P / Escape: Pause/Resume
  */
 
 interface InputState {
-  left: boolean;
-  right: boolean;
-  down: boolean;
-  up: boolean;
-  rotate: boolean;
-  drop: boolean;
+  // Player 1 (Arrow keys)
+  p1Left: boolean;
+  p1Right: boolean;
+  p1Down: boolean;
+  p1Rotate: boolean;
+  p1Drop: boolean;
+  
+  // Player 2 (WASD)
+  p2Left: boolean;
+  p2Right: boolean;
+  p2Down: boolean;
+  p2Rotate: boolean;
+  p2Drop: boolean;
+  
+  // Shared
   pause: boolean;
 }
 
@@ -20,52 +44,99 @@ interface InputManager {
 }
 
 /**
- * Create input manager
+ * Create input manager with separate player controls
  */
 export function createInputManager(): InputManager {
   const state: InputState = {
-    left: false,
-    right: false,
-    down: false,
-    up: false,
-    rotate: false,
-    drop: false,
+    // Player 1
+    p1Left: false,
+    p1Right: false,
+    p1Down: false,
+    p1Rotate: false,
+    p1Drop: false,
+    
+    // Player 2
+    p2Left: false,
+    p2Right: false,
+    p2Down: false,
+    p2Rotate: false,
+    p2Drop: false,
+    
+    // Shared
     pause: false,
   };
 
   const listeners = new Map<string, Function[]>();
 
   /**
-   * Handle keyboard events
+   * Handle keyboard events with player-specific controls
    */
   const handleKeyDown = (e: KeyboardEvent): void => {
     const key = e.key.toLowerCase();
 
-    // Player 1 controls (WASD / Arrow keys)
-    if (
-      key === 'arrowleft' ||
-      key === 'a'
-    ) {
-      state.left = true;
-      emit('move-left');
+    // Player 1 controls (Arrow Keys)
+    if (key === 'arrowleft') {
+      e.preventDefault();
+      state.p1Left = true;
+      emit('p1-move-left');
     }
-    if (key === 'arrowright' || key === 'd') {
-      state.right = true;
-      emit('move-right');
+    if (key === 'arrowright') {
+      e.preventDefault();
+      state.p1Right = true;
+      emit('p1-move-right');
     }
-    if (key === 'arrowdown' || key === 's') {
-      state.down = true;
-      emit('soft-drop');
+    if (key === 'arrowdown') {
+      e.preventDefault();
+      state.p1Down = true;
+      emit('p1-soft-drop');
     }
-    if (key === 'arrowup' || key === 'w' || key === ' ') {
-      state.rotate = true;
-      emit('rotate');
+    if (key === 'arrowup') {
+      e.preventDefault();
+      state.p1Rotate = true;
+      emit('p1-rotate');
+    }
+    if (key === ' ') {
+      e.preventDefault();
+      state.p1Rotate = true;
+      emit('p1-rotate');
     }
     if (key === 'enter') {
-      state.drop = true;
-      emit('hard-drop');
+      e.preventDefault();
+      state.p1Drop = true;
+      emit('p1-hard-drop');
     }
-    if (key === 'escape' || key === 'p') {
+
+    // Player 2 controls (WASD)
+    if (key === 'a') {
+      state.p2Left = true;
+      emit('p2-move-left');
+    }
+    if (key === 'd') {
+      state.p2Right = true;
+      emit('p2-move-right');
+    }
+    if (key === 's') {
+      e.preventDefault();
+      state.p2Down = true;
+      emit('p2-soft-drop');
+    }
+    if (key === 'w') {
+      e.preventDefault();
+      state.p2Rotate = true;
+      emit('p2-rotate');
+    }
+    if (key === 'q') {
+      state.p2Drop = true;
+      emit('p2-hard-drop');
+    }
+
+    // Shared controls
+    if (key === 'escape') {
+      e.preventDefault();
+      state.pause = true;
+      emit('pause');
+    }
+    if (key === 'p') {
       state.pause = true;
       emit('pause');
     }
@@ -74,57 +145,23 @@ export function createInputManager(): InputManager {
   const handleKeyUp = (e: KeyboardEvent): void => {
     const key = e.key.toLowerCase();
 
-    if (key === 'arrowleft' || key === 'a') state.left = false;
-    if (key === 'arrowright' || key === 'd') state.right = false;
-    if (key === 'arrowdown' || key === 's') state.down = false;
-    if (key === 'arrowup' || key === 'w' || key === ' ') state.rotate = false;
-    if (key === 'enter') state.drop = false;
+    // Player 1 (Arrow keys)
+    if (key === 'arrowleft') state.p1Left = false;
+    if (key === 'arrowright') state.p1Right = false;
+    if (key === 'arrowdown') state.p1Down = false;
+    if (key === 'arrowup') state.p1Rotate = false;
+    if (key === ' ') state.p1Rotate = false;
+    if (key === 'enter') state.p1Drop = false;
+
+    // Player 2 (WASD)
+    if (key === 'a') state.p2Left = false;
+    if (key === 'd') state.p2Right = false;
+    if (key === 's') state.p2Down = false;
+    if (key === 'w') state.p2Rotate = false;
+    if (key === 'q') state.p2Drop = false;
+
+    // Shared
     if (key === 'escape' || key === 'p') state.pause = false;
-  };
-
-  /**
-   * Handle gamepad input
-   */
-  const handleGamepad = (): void => {
-    const gamepads = navigator.getGamepads();
-    if (!gamepads || gamepads.length === 0) return;
-
-    const gamepad = gamepads[0];
-    if (!gamepad) return;
-
-    // D-pad / Analog stick
-    if (gamepad.buttons[14]?.pressed || gamepad.axes[0] < -0.5) {
-      // Left
-      state.left = true;
-      emit('move-left');
-    }
-    if (gamepad.buttons[15]?.pressed || gamepad.axes[0] > 0.5) {
-      // Right
-      state.right = true;
-      emit('move-right');
-    }
-    if (gamepad.buttons[13]?.pressed || gamepad.axes[1] > 0.5) {
-      // Down
-      state.down = true;
-      emit('soft-drop');
-    }
-
-    // Buttons
-    if (gamepad.buttons[0]?.pressed || gamepad.buttons[2]?.pressed) {
-      // A or X button - rotate
-      state.rotate = true;
-      emit('rotate');
-    }
-    if (gamepad.buttons[1]?.pressed || gamepad.buttons[3]?.pressed) {
-      // B or Y button - drop
-      state.drop = true;
-      emit('hard-drop');
-    }
-    if (gamepad.buttons[9]?.pressed) {
-      // Start - pause
-      state.pause = true;
-      emit('pause');
-    }
   };
 
   /**
@@ -160,7 +197,7 @@ export function createInputManager(): InputManager {
    * Update input state (call each frame)
    */
   const update = (): void => {
-    handleGamepad();
+    // Currently keyboard-only, can add gamepad later
   };
 
   // Add event listeners
@@ -172,26 +209,5 @@ export function createInputManager(): InputManager {
     listeners,
     update,
     subscribe,
-  };
-}
-
-/**
- * Player 1 specific input getter
- */
-export function getPlayer1Input(manager: InputManager): {
-  moveLeft: boolean;
-  moveRight: boolean;
-  softDrop: boolean;
-  rotate: boolean;
-  hardDrop: boolean;
-  pause: boolean;
-} {
-  return {
-    moveLeft: manager.state.left,
-    moveRight: manager.state.right,
-    softDrop: manager.state.down,
-    rotate: manager.state.rotate,
-    hardDrop: manager.state.drop,
-    pause: manager.state.pause,
   };
 }

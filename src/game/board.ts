@@ -285,3 +285,61 @@ export function isBoardFull(board: Board): boolean {
 export function cloneBoard(board: Board): Board {
   return JSON.parse(JSON.stringify(board));
 }
+
+/**
+ * Rotate piece 90 degrees clockwise
+ * Puyo pieces are 2-block pieces that rotate between vertical and horizontal
+ */
+export function rotatePiece(piece: Piece, board: Board): Piece | null {
+  const newPiece = { ...piece, rotation: (piece.rotation + 1) % 2 };
+
+  // For a 2-block puyo piece, rotate between two states:
+  // Rotation 0 (vertical): [[0, 0], [1, 0]]  - one above the other
+  // Rotation 1 (horizontal): [[0, 0], [0, 1]] - side by side
+  let rotatedPositions;
+  
+  if (piece.rotation === 0) {
+    // Vertical to horizontal
+    rotatedPositions = [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 }
+    ];
+  } else {
+    // Horizontal to vertical
+    rotatedPositions = [
+      { row: 0, col: 0 },
+      { row: 1, col: 0 }
+    ];
+  }
+
+  newPiece.positions = rotatedPositions;
+
+  // Check if new position is valid
+  if (canPlacePiece(board, newPiece)) {
+    return newPiece;
+  }
+
+  // Try wall kick - shift left/right to fit
+  for (let shift = 1; shift <= 2; shift++) {
+    // Try right shift
+    const rightShifted = {
+      ...newPiece,
+      x: newPiece.x + shift,
+    };
+    if (canPlacePiece(board, rightShifted)) {
+      return rightShifted;
+    }
+
+    // Try left shift
+    const leftShifted = {
+      ...newPiece,
+      x: newPiece.x - shift,
+    };
+    if (canPlacePiece(board, leftShifted)) {
+      return leftShifted;
+    }
+  }
+
+  // Rotation not possible
+  return null;
+}

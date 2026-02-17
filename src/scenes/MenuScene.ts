@@ -4,6 +4,7 @@
 
 import Phaser from 'phaser';
 import { useGameStore } from '../game/gameState';
+import { soundManager } from '../audio/soundManager';
 import { GameMode, Difficulty } from '../game/types';
 
 export class MenuScene extends Phaser.Scene {
@@ -17,6 +18,9 @@ export class MenuScene extends Phaser.Scene {
 
     // Background
     this.cameras.main.setBackgroundColor('#1a1a2e');
+
+    // Start background music
+    soundManager.startBackgroundMusic();
 
     // Title
     this.add.text(width / 2, height / 4, 'PUYO PUYO', {
