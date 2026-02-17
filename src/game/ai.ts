@@ -10,9 +10,7 @@ import {
   movePieceDown,
   placePiece,
   detectChains,
-  detectMatches,
 } from './board';
-import { BOARD_WIDTH } from './constants';
 
 /**
  * Evaluate board state for AI decision making
@@ -35,7 +33,7 @@ export function evaluateBoard(board: Board, chainCount: number): number {
   score -= Math.abs(highestPiece) * 100;
 
   // Reward balanced piece distribution
-  let columHeights: number[] = [];
+  const columHeights: number[] = [];
   for (let col = 0; col < board.width; col++) {
     for (let row = board.height - 1; row >= 0; row--) {
       if (board.grid[row][col].color !== 'empty') {
@@ -95,7 +93,7 @@ export function simulateDrop(board: Board, piece: Piece): { board: Board; chainC
     currentPiece = next;
   }
 
-  let newBoard = placePiece(board, currentPiece);
+  const newBoard = placePiece(board, currentPiece);
   const result = detectChains(newBoard);
 
   return result;
@@ -104,7 +102,7 @@ export function simulateDrop(board: Board, piece: Piece): { board: Board; chainC
 /**
  * Find best move using greedy evaluation
  */
-export function findBestMove(board: Board, piece: Piece, depth: number = 1): Piece {
+export function findBestMove(board: Board, piece: Piece, _depth: number = 1): Piece {
   const possibleMoves = getPossibleMoves(board, piece);
 
   if (possibleMoves.length === 0) {
@@ -131,7 +129,7 @@ export function findBestMove(board: Board, piece: Piece, depth: number = 1): Pie
  * Make AI decision with configurable depth
  * Returns the piece position the AI wants to place at
  */
-export function getAIMove(gameState: GameState, difficulty: string): Piece | null {
+export function getAIMove(gameState: GameState, _difficulty?: string): Piece | null {
   if (!gameState.currentPiece) return null;
 
   const piece = gameState.currentPiece;

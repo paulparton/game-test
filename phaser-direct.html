@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puyo Puyo - Direct Phaser Test</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+      font-family: monospace;
+    }
+    #info {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: #000;
+      color: #0f0;
+      padding: 15px;
+      z-index: 9999;
+      border: 3px solid #0f0;
+      font-size: 13px;
+      max-width: 50%;
+      max-height: 60%;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">Loading Phaser...</div>
+  <div id="game-container" style="width:100%; height:100%;"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+  <script>
+    const info = document.getElementById('info');
+    const logs = [];
+
+    function log(msg) {
+      logs.push(msg);
+      if (logs.length > 25) logs.shift();
+      info.innerHTML = logs.map((l, i) => `<div>${i + 1}. ${l}</div>`).join('');
+      console.log(msg);
+    }
+
+    log('1. HTML Document Ready');
+    log(`2. Window: ${window.innerWidth}x${window.innerHeight}`);
+    log(`3. Phaser: ${window.Phaser ? 'YES' : 'NO'}`);
+
+    const config = {
+      type: Phaser.AUTO,
+      width: '100%',
+      height: '100%',
+      parent: 'game-container',
+      backgroundColor: '#1a1a2e',
+      scene: {
+        create: function() {
+          log('4. Scene create() called');
+          
+          // Add camera background
+          this.cameras.main.setBackgroundColor(0x00ff00);
+          log('5. Background set to GREEN');
+
+          // Add shapes
+          const width = this.sys.game.config.width;
+          const height = this.sys.game.config.height;
+          
+          log(`6. Canvas: ${width}x${height}`);
+
+          // Red rectangle
+          this.add.rectangle(width/2, height/2, 400, 300, 0xff0000);
+          log('7. Red rectangle added');
+
+          // Text
+          this.add.text(width/2, height/2 - 100, 'PHASER WORKS!', {
+            fontSize: '64px',
+            fontFamily: 'Arial',
+            color: '#ffffff'
+          }).setOrigin(0.5);
+          log('8. Text added');
+
+          // Button
+          const btn = this.add.rectangle(width/2, height/2 + 100, 250, 70, 0x00ff00)
+                        .setInteractive();
+          this.add.text(width/2, height/2 + 100, 'CLICK HERE', {
+            fontSize: '32px',
+            color: '#000000'
+          }).setOrigin(0.5);
+          
+          btn.on('pointerdown', () => {
+            log('9. ✓ BUTTON CLICKED!');
+          });
+
+          log('10. Render complete - you should see GREEN background with RED rectangle');
+        },
+        update: function() {
+          // update loop
+        }
+      }
+    };
+
+    try {
+      log('11. Creating Phaser.Game instance...');
+      const game = new Phaser.Game(config);
+      log('12. Game instance created successfully');
+      log('13. Canvas element: ' + (document.querySelector('canvas') ? 'FOUND' : 'NOT FOUND'));
+    } catch (e) {
+      log('ERROR: ' + e.message);
+      console.error(e);
+    }
+  </script>
+</body>
+</html>

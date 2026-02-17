@@ -105,7 +105,7 @@ export class MenuScene extends Phaser.Scene {
         .on('pointerdown', () => {
           selectedDifficulty = diff as Difficulty;
           // Update button colors
-          difficulties.forEach((d, i) => {
+          difficulties.forEach((d) => {
             btn.setColor(d === selectedDifficulty ? '#ffff44' : '#cccccc');
           });
         });

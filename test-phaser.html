@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { margin: 0; padding: 0; }
+        #debug { position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.8); color: #0f0; font-size: 12px; padding: 10px; z-index: 9999; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div id="debug">Loading...</div>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+    <script>
+        const debugEl = document.getElementById('debug');
+        const logs = [];
+        
+        function log(msg) {
+            logs.push(msg);
+            if (logs.length > 15) logs.shift();
+            debugEl.innerHTML = logs.join('<br>');
+            console.log(msg);
+        }
+        
+        log('📄 HTML loaded, Phaser should be ready');
+        
+        // Create a simple Phaser game
+        const config = {
+            type: Phaser.AUTO,
+            width: 1200,
+            height: 800,
+            scene: {
+                create: function() {
+                    log('✅ Scene create() called');
+                    this.cameras.main.setBackgroundColor(0x00ff00);
+                    log('✅ Background set to green');
+                    
+                    // Add a rectangle
+                    this.add.rectangle(600, 400, 300, 200, 0xff0000);
+                    log('✅ Red rectangle added');
+                    
+                    // Add text
+                    this.add.text(600, 400, 'PHASER WORKS!', {
+                        fontSize: '48px',
+                        color: '#ffffff',
+                        align: 'center'
+                    }).setOrigin(0.5);
+                    log('✅ Text added');
+                }
+            }
+        };
+        
+        log('🎮 Creating Phaser game...');
+        try {
+            const game = new Phaser.Game(config);
+            log('✅ Game created successfully');
+            window.game = game;
+        } catch(e) {
+            log('❌ Error: ' + e.message);
+            console.error(e);
+        }
+    </script>
+</body>
+</html>

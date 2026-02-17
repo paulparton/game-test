@@ -2,8 +2,6 @@ import { create } from 'zustand';
 import {
   GameState,
   PlayerState,
-  Piece,
-  Board,
   GameMode,
   Difficulty,
   PuyoColor,
@@ -14,12 +12,9 @@ import {
   movePieceLeft,
   movePieceRight,
   movePieceDown,
-  canMovePieceDown,
   placePiece,
   detectChains,
   addGarbage,
-  isBoardFull,
-  cloneBoard,
 } from './board';
 import { ATTACK_METER_MAX } from './constants';
 

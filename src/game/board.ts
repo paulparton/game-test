@@ -213,7 +213,6 @@ export function detectMatches(board: Board): Position[] {
  */
 export function clearMatches(board: Board, positions: Position[]): Board {
   const newBoard = JSON.parse(JSON.stringify(board));
-  const positionSet = new Set(positions.map((p) => `${p.row},${p.col}`));
 
   positions.forEach(({ row, col }) => {
     newBoard.grid[row][col] = { color: PuyoColor.Empty };

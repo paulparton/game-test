@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; padding: 20px; background: #000; color: #0f0; font-family: monospace; }
+    .box { border: 2px solid #0f0; padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <strong>Diagnostics Page</strong>
+  </div>
+  <div class="box" id="canvas-test">
+    <div>Canvas Test:</div>
+    <canvas id="test-canvas" width="200" height="100" style="border: 1px solid #0f0;"></canvas>
+    <div id="canvas-result"></div>
+  </div>
+  <div class="box" id="phaser-test">
+    <div>Phaser Test: Loading...</div>
+  </div>
+  <div class="box" id="info"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+  <script>
+    const infoDiv = document.getElementById('info');
+    const phaserDiv = document.getElementById('phaser-test');
+    
+    AddLog('Page loaded');
+
+    // Test canvas rendering
+    const canvas = document.getElementById('test-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    if (ctx) {
+      ctx.fillStyle = '#00ff00';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#000000';
+      ctx.font = '14px monospace';
+      ctx.fillText('Canvas OK', 10, 50);
+      document.getElementById('canvas-result').innerHTML = '✓ Canvas 2D context works';
+      AddLog('Canvas 2D rendering: OK');
+    } else {
+      document.getElementById('canvas-result').innerHTML = '✗ Canvas 2D context failed';
+      AddLog('Canvas 2D rendering: FAILED');
+    }
+
+    // Test Phaser
+    if (typeof Phaser === 'undefined') {
+      AddLog('Phaser: NOT LOADED');
+      phaserDiv.innerHTML = '<div>✗ Phaser not loaded from CDN</div>';
+    } else {
+      AddLog('Phaser: LOADED');
+      AddLog(`Phaser version: ${Phaser.VERSION}`);
+      
+      const phaserConfig = {
+        type: Phaser.AUTO,
+        width: 400,
+        height: 200,
+        parent: 'phaser-test',
+        backgroundColor: '#1a1a2e',
+        scene: {
+          create: function() {
+            AddLog('Phaser scene created');
+            this.cameras.main.setBackgroundColor(0x00ff00);
+            this.add.text(200, 100, 'Phaser rendering!', {
+              fontSize: '24px',
+              color: '#000000'
+            }).setOrigin(0.5);
+          }
+        }
+      };
+
+      try {
+        const game = new Phaser.Game(phaserConfig);
+        AddLog('Phaser game created');
+      } catch (e) {
+        AddLog('Phaser error: ' + e.message);
+      }
+    }
+
+    function AddLog(msg) {
+      const p = document.createElement('div');
+      p.textContent = msg;
+      infoDiv.appendChild(p);
+      console.log(msg);
+    }
+  </script>
+</body>
+</html>

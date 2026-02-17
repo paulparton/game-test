@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; background: #000; }
+    #color-test { width: 100%; height: 100%; background: #00ff00; }
+    #text { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ffffff; font-size: 48px; font-family: monospace; background: rgba(0,0,0,0.8); padding: 30px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="color-test"></div>
+  <div id="text">
+    <div>Simple HTML Test</div>
+    <div>If you see this text on a GREEN background,</div>
+    <div>then HTML/CSS rendering is working!</div>
+    <br/>
+    <div>This div is 100% width and height with green background.</div>
+  </div>
+  <script>
+    console.log('✅ test-html.html loaded');
+    document.body.addEventListener('click', () => {
+      alert('✅ Clicks work!');
+    });
+  </script>
+</body>
+</html>

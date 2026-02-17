@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Puyo Puyo - Game</title>
     <style>
@@ -11,25 +10,117 @@
         padding: 0;
         box-sizing: border-box;
       }
-      body {
-        font-family: 'Arial', sans-serif;
-        height: 100vh;
+      html, body {
+        width: 100%;
+        height: 100%;
         overflow: hidden;
-        background: #1a1a1a;
-        color: #fff;
+      }
+      body {
+        font-family: monospace;
+        background: #000000;
+        color: #00ff00;
       }
       #app {
         width: 100%;
         height: 100%;
+        background: #000000;
+        position: relative;
       }
+      #status {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: #000000;
+        color: #00ff00;
+        font-size: 13px;
+        padding: 10px 15px;
+        z-index: 99999;
+        border: 3px solid #00ff00;
+        max-width: 35%;
+        max-height: 50%;
+        overflow-y: auto;
+        line-height: 1.4;
+      }
+      .line { margin: 2px 0; }
+      .ok { color: #00ff00; }
+      .err { color: #ff4444; }
       canvas {
         display: block;
-        background: #222;
+        background: #111111;
+      }
+      #debug-info {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.9);
+        color: #00ff00;
+        font-size: 12px;
+        padding: 10px;
+        border: 1px solid #00ff00;
+        font-family: monospace;
       }
     </style>
   </head>
   <body>
+    <div id="status">Status: Starting...</div>
+    <div id="debug-info"></div>
     <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <script>
+      const statusEl = document.getElementById('status');
+      const debugEl = document.getElementById('debug-info');
+      const logs = [];
+
+      function addStatus(msg, isError = false) {
+        const line = `<div class="line ${isError ? 'err' : 'ok'}">${msg}</div>`;
+        logs.push(line);
+        if (logs.length > 30) logs.shift();
+        statusEl.innerHTML = logs.join('');
+        console.log((isError ? '❌ ' : '✅ ') + msg);
+      }
+
+      window.addStatus = addStatus;
+
+      addStatus('🔧 HTML loaded');
+      addStatus(`📐 Window size: ${window.innerWidth}x${window.innerHeight}`);
+      addStatus(`📱 Device pixel ratio: ${window.devicePixelRatio}`);
+      addStatus(`🌐 User agent: ${navigator.userAgent.substring(0, 50)}...`);
+
+      // Add app div detection
+      const appDiv = document.getElementById('app');
+      addStatus(`✓ App div found (${appDiv?.clientWidth}x${appDiv?.clientHeight})`);
+
+      // Setup global error handlers
+      window.addEventListener('error', (e) => {
+        addStatus(`JS Error: ${e.message}`, true);
+      });
+
+      window.addEventListener('unhandledrejection', (e) => {
+        addStatus(`Unhandled: ${e.reason}`, true);
+      });
+
+      // Log when canvas appears
+      const originalQuerySelector = document.querySelector;
+      const originalQuerySelectorAll = document.querySelectorAll;
+
+      document.querySelector = function(selector) {
+        const result = originalQuerySelector.call(this, selector);
+        if (selector === 'canvas' && result) {
+          addStatus(`🎨 Canvas found! ${result.width}x${result.height}`);
+          addStatus(`📍 Canvas position: (${result.offsetLeft}, ${result.offsetTop})`);
+          addStatus(`👁️ Canvas visible: ${result.offsetParent !== null}`);
+        }
+        return result;
+      };
+
+      addStatus('⏳ Loading main.ts...');
+    </script>
+    <script type="module">
+      import('./src/main.ts').then(() => {
+        window.addStatus('✅ main.ts loaded successfully');
+      }).catch(err => {
+        window.addStatus('❌ Failed to load main.ts: ' + err.message, true);
+        window.addStatus('Stack: ' + err.stack, true);
+      });
+    </script>
   </body>
 </html>

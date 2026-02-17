@@ -34,6 +34,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Set background color
+    this.cameras.main.setBackgroundColor('#1a1a2e');
+
     // Initialize input manager
     this.inputManager = createInputManager();
 
@@ -66,7 +69,15 @@ export class GameScene extends Phaser.Scene {
     const store = useGameStore.getState();
     const currentTime = this.time.now || 0;
 
-    if (!store.isGameActive || store.player1.gameState.isPaused) {
+    // Check for game over
+    if (!store.isGameActive) {
+      this.showGameOver();
+      return;
+    }
+
+    if (store.player1.gameState.isPaused) {
+      this.drawBoard();
+      this.drawPausedOverlay();
       return;
     }
 
@@ -187,7 +198,7 @@ export class GameScene extends Phaser.Scene {
           const x = baseX + col * PUYO_SIZE + PUYO_SIZE / 2;
           const y = baseY + row * PUYO_SIZE + PUYO_SIZE / 2;
           const color =
-            this.colors[gameState.currentPiece.colors[idx] as keyof typeof this.colors] || 0x333333;
+            this.colors[gameState.currentPiece?.colors[idx] as keyof typeof this.colors] || 0x333333;
 
           this.drawPuyo(graphics, x, y, PUYO_SIZE / 2 - 2, color);
         }
@@ -244,5 +255,94 @@ export class GameScene extends Phaser.Scene {
         this.drawPuyo(graphics, x, y, PUYO_SIZE / 4 - 1, color);
       });
     }
+  }
+
+  private showGameOver(): void {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    // Clear old text
+    this.children.list.forEach((child) => {
+      if (child instanceof Phaser.GameObjects.Text) {
+        child.destroy();
+      }
+    });
+
+    const store = useGameStore.getState();
+
+    // Semi-transparent overlay
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+
+    // Game Over text
+    this.add.text(width / 2, height / 2 - 100, 'GAME OVER', {
+      fontSize: '64px',
+      fontFamily: 'Arial Black, Arial, sans-serif',
+      color: '#ff4444',
+      align: 'center',
+      fontStyle: 'bold',
+    }).setOrigin(0.5);
+
+    // Final score
+    this.add.text(width / 2, height / 2, `Final Score: ${store.player1.gameState.score}`, {
+      fontSize: '32px',
+      fontFamily: 'Arial, sans-serif',
+      color: '#ffff44',
+      align: 'center',
+    }).setOrigin(0.5);
+
+    // Return to menu button
+    const btnWidth = 200;
+    const btnHeight = 50;
+    const btnY = height / 2 + 100;
+
+    const btn = this.add.rectangle(width / 2, btnY, btnWidth, btnHeight, 0x44ff44, 0.2);
+    btn.setStrokeStyle(2, 0x44ff44);
+    btn.setInteractive();
+
+    const btnText = this.add.text(width / 2, btnY, 'MENU', {
+      fontSize: '24px',
+      fontFamily: 'Arial, sans-serif',
+      color: '#44ff44',
+      align: 'center',
+    }).setOrigin(0.5);
+
+    btn.on('pointerover', () => {
+      btn.setFillStyle(0x44ff44, 0.3);
+      btnText.setScale(1.1);
+    });
+
+    btn.on('pointerout', () => {
+      btn.setFillStyle(0x44ff44, 0.2);
+      btnText.setScale(1);
+    });
+
+    btn.on('pointerdown', () => {
+      store.resetGame();
+      this.scene.start('MenuScene');
+    });
+  }
+
+  private drawPausedOverlay(): void {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    // Semi-transparent overlay
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5);
+
+    // Paused text
+    this.add.text(width / 2, height / 2, 'PAUSED', {
+      fontSize: '48px',
+      fontFamily: 'Arial Black, Arial, sans-serif',
+      color: '#ffff44',
+      align: 'center',
+      fontStyle: 'bold',
+    }).setOrigin(0.5);
+
+    this.add.text(width / 2, height / 2 + 60, 'Press ESC to Resume', {
+      fontSize: '18px',
+      fontFamily: 'Arial, sans-serif',
+      color: '#cccccc',
+      align: 'center',
+    }).setOrigin(0.5);
   }
 }
